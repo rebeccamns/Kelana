@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kelana Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --white: #ffffff;
+    --cream: #faf8f5;
+    --sand: #f0ebe3;
+    --blush: #f2e8e8;
+    --poppy: #b05147;
+    --terracotta: #a05740;
+    --wine: #7a4158;
+    --elderberry: #5a3060;
+    --grass: #5a6b2e;
+    --ashwagandha: #606b30;
+    --text-dark: #2a2420;
+    --text-mid: #5a4f48;
+    --text-light: #9a8f88;
+    --border: #e8e0d8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    min-height: 100vh;
+    padding: 32px 16px 60px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    color: var(--text-dark);
+  }
+
+  header h1 span {
+    font-style: italic;
+    color: var(--terracotta);
+  }
+
+  header p {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+  }
+
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 22px;
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .slider-row:last-child { margin-bottom: 0; }
+
+  .slider-label {
+    font-size: 0.82rem;
+    color: var(--text-mid);
+    width: 130px;
+    flex-shrink: 0;
+  }
+
+  .slider-wrap {
+    flex: 1;
+    position: relative;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--sand);
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--poppy);
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 1px 6px rgba(176,81,71,0.3);
+    transition: transform 0.15s;
+  }
+
+  input[type=range]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+  }
+
+  .slider-val {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    width: 86px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* Bar chart */
+  .bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .bar-label {
+    font-size: 0.78rem;
+    color: var(--text-mid);
+    width: 90px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .bar-track {
+    flex: 1;
+    height: 10px;
+    background: var(--sand);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+  }
+
+  .bar-fill.bahan   { background: #8b7fd4; }
+  .bar-fill.pkg     { background: var(--poppy); }
+  .bar-fill.hpp     { background: #a0998c; }
+  .bar-fill.harga   { background: #5a9e78; }
+  .bar-fill.profit  { background: var(--grass); }
+
+  .bar-amt {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    width: 80px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* Stats grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+  }
+
+  .stat-box {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .stat-box.accent {
+    background: var(--blush);
+    border-color: #e8d0cc;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 6px;
+  }
+
+  .stat-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--text-dark);
+    line-height: 1;
+  }
+
+  .stat-value.positive { color: var(--grass); }
+  .stat-value.warn     { color: var(--terracotta); }
+
+  .stat-sub {
+    font-size: 0.7rem;
+    color: var(--text-light);
+    margin-top: 4px;
+  }
+
+  /* BEP section */
+  .bep-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .bep-box {
+    background: var(--sand);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .bep-box.full {
+    grid-column: 1 / -1;
+    background: var(--blush);
+  }
+
+  .tip {
+    font-size: 0.78rem;
+    color: var(--text-mid);
+    background: var(--sand);
+    border-left: 3px solid var(--terracotta);
+    padding: 10px 14px;
+    border-radius: 0 8px 8px 0;
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+  }
+
+  @media (max-width: 520px) {
+    .slider-label { width: 100px; font-size: 0.76rem; }
+    .slider-val { width: 74px; font-size: 0.76rem; }
+    .bar-label { width: 72px; font-size: 0.72rem; }
+    .bar-amt { width: 68px; font-size: 0.72rem; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .bep-grid { grid-template-columns: 1fr; }
+    .bep-box.full { grid-column: 1; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1> <span>Kelana</span> Calculator</h1>
+  <p>Pricing · Margin · Break Even</p>
+</header>
+
+<div class="container">
+
+  <!-- INPUT -->
+  <div class="card">
+    <div class="card-title">Input Biaya Produksi</div>
+
+    <div class="slider-row">
+      <span class="slider-label">Biaya bahan/pcs</span>
+      <div class="slider-wrap">
+        <input type="range" id="bahan" min="50000" max="500000" step="1000" value="175000">
+      </div>
+      <span class="slider-val" id="bahanVal">Rp175.000</span>
+    </div>
+
+    <div class="slider-row">
+      <span class="slider-label">Biaya packaging</span>
+      <div class="slider-wrap">
+        <input type="range" id="pkg" min="5000" max="200000" step="1000" value="55000">
+      </div>
+      <span class="slider-val" id="pkgVal">Rp55.000</span>
+    </div>
+
+    <div class="slider-row">
+      <span class="slider-label">Harga jual</span>
+      <div class="slider-wrap">
+        <input type="range" id="harga" min="100000" max="1000000" step="5000" value="324000">
+      </div>
+      <span class="slider-val" id="hargaVal">Rp324.000</span>
+    </div>
+
+    <div class="slider-row">
+      <span class="slider-label">Diskon / voucher</span>
+      <div class="slider-wrap">
+        <input type="range" id="diskon" min="0" max="50" step="1" value="0">
+      </div>
+      <span class="slider-val" id="diskonVal">0%</span>
+    </div>
+
+    <div class="slider-row">
+      <span class="slider-label">Jumlah produk</span>
+      <div class="slider-wrap">
+        <input type="range" id="qty" min="1" max="50" step="1" value="6">
+      </div>
+      <span class="slider-val" id="qtyVal">6 pcs</span>
+    </div>
+  </div>
+
+  <!-- BREAKDOWN BAR -->
+  <div class="card">
+    <div class="card-title">Breakdown per Pcs</div>
+    <div class="bars">
+      <div class="bar-row">
+        <span class="bar-label">Bahan</span>
+        <div class="bar-track"><div class="bar-fill bahan" id="barBahan"></div></div>
+        <span class="bar-amt" id="amtBahan">Rp175.000</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Packaging</span>
+        <div class="bar-track"><div class="bar-fill pkg" id="barPkg"></div></div>
+        <span class="bar-amt" id="amtPkg">Rp55.000</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">HPP total</span>
+        <div class="bar-track"><div class="bar-fill hpp" id="barHpp"></div></div>
+        <span class="bar-amt" id="amtHpp">Rp230.000</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Harga jual</span>
+        <div class="bar-track"><div class="bar-fill harga" id="barHarga"></div></div>
+        <span class="bar-amt" id="amtHarga">Rp324.000</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-label">Profit/pcs</span>
+        <div class="bar-track"><div class="bar-fill profit" id="barProfit"></div></div>
+        <span class="bar-amt" id="amtProfit">Rp94.000</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="card">
+    <div class="card-title">Ringkasan</div>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-label">HPP / pcs</div>
+        <div class="stat-value" id="statHpp">Rp230.000</div>
+        <div class="stat-sub">bahan + packaging</div>
+      </div>
+      <div class="stat-box accent">
+        <div class="stat-label">Profit / pcs</div>
+        <div class="stat-value positive" id="statProfit">Rp94.000</div>
+        <div class="stat-sub" id="statProfitSub">setelah diskon 0%</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Profit margin</div>
+        <div class="stat-value" id="statMargin">29%</div>
+        <div class="stat-sub">idealnya ≥ 30%</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Markup dari HPP</div>
+        <div class="stat-value" id="statMarkup">41%</div>
+        <div class="stat-sub">dari HPP</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label" id="revLabel">Revenue total</div>
+        <div class="stat-value" id="statRevenue">Rp1.944.000</div>
+        <div class="stat-sub" id="revSub">kalau semua laku</div>
+      </div>
+      <div class="stat-box accent">
+        <div class="stat-label" id="profitTotalLabel">Profit total</div>
+        <div class="stat-value positive" id="statProfitTotal">Rp564.000</div>
+        <div class="stat-sub" id="profitTotalSub">bersih dari 6 pcs</div>
+      </div>
+    </div>
+    <div class="tip" id="marginTip">💡 Margin 29% — hampir ideal. Coba naikkan harga jual sedikit atau kurangi packaging cost.</div>
+  </div>
+
+  <!-- BEP -->
+  <div class="card">
+    <div class="card-title">Break Even Point</div>
+    <div class="bep-grid">
+      <div class="bep-box">
+        <div class="stat-label">Modal awal</div>
+        <div class="stat-value" id="bepModal">Rp2.500.000</div>
+        <div class="stat-sub">estimasi kamu</div>
+      </div>
+      <div class="bep-box">
+        <div class="stat-label">BEP (unit)</div>
+        <div class="stat-value" id="bepUnit">–</div>
+        <div class="stat-sub">pcs harus terjual</div>
+      </div>
+      <div class="bep-box full">
+        <div class="stat-label">BEP (omset)</div>
+        <div class="stat-value" id="bepOmset">–</div>
+        <div class="stat-sub">total revenue untuk balik modal</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="slider-row" style="margin-bottom:0">
+      <span class="slider-label">Modal awal</span>
+      <div class="slider-wrap">
+        <input type="range" id="modal" min="500000" max="10000000" step="100000" value="2500000">
+      </div>
+      <span class="slider-val" id="modalVal">Rp2.500.000</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const fmt = v => 'Rp' + Math.round(v).toLocaleString('id-ID').replace(/\./g, '.');
+
+  function calc() {
+    const bahan  = +document.getElementById('bahan').value;
+    const pkg    = +document.getElementById('pkg').value;
+    const harga  = +document.getElementById('harga').value;
+    const diskon = +document.getElementById('diskon').value;
+    const qty    = +document.getElementById('qty').value;
+    const modal  = +document.getElementById('modal').value;
+
+    // Update display values
+    document.getElementById('bahanVal').textContent  = fmt(bahan);
+    document.getElementById('pkgVal').textContent    = fmt(pkg);
+    document.getElementById('hargaVal').textContent  = fmt(harga);
+    document.getElementById('diskonVal').textContent = diskon + '%';
+    document.getElementById('qtyVal').textContent    = qty + ' pcs';
+    document.getElementById('modalVal').textContent  = fmt(modal);
+
+    const hpp = bahan + pkg;
+    const hargaAfterDiskon = harga * (1 - diskon / 100);
+    const profitPcs = hargaAfterDiskon - hpp;
+    const margin = hargaAfterDiskon > 0 ? (profitPcs / hargaAfterDiskon) * 100 : 0;
+    const markup = hpp > 0 ? (profitPcs / hpp) * 100 : 0;
+    const revenue = hargaAfterDiskon * qty;
+    const profitTotal = profitPcs * qty;
+
+    // BEP
+    const bepUnit = profitPcs > 0 ? Math.ceil(modal / profitPcs) : Infinity;
+    const bepOmset = profitPcs > 0 ? bepUnit * hargaAfterDiskon : Infinity;
+
+    // Bars — max = harga * 1.1 for scale
+    const maxBar = harga * 1.1;
+    const pct = v => Math.min(100, Math.max(0, (v / maxBar) * 100)) + '%';
+
+    document.getElementById('barBahan').style.width  = pct(bahan);
+    document.getElementById('barPkg').style.width    = pct(pkg);
+    document.getElementById('barHpp').style.width    = pct(hpp);
+    document.getElementById('barHarga').style.width  = pct(hargaAfterDiskon);
+    document.getElementById('barProfit').style.width = pct(Math.max(0, profitPcs));
+
+    document.getElementById('amtBahan').textContent  = fmt(bahan);
+    document.getElementById('amtPkg').textContent    = fmt(pkg);
+    document.getElementById('amtHpp').textContent    = fmt(hpp);
+    document.getElementById('amtHarga').textContent  = fmt(hargaAfterDiskon);
+    document.getElementById('amtProfit').textContent = profitPcs >= 0 ? fmt(profitPcs) : '-' + fmt(Math.abs(profitPcs));
+
+    // Stats
+    document.getElementById('statHpp').textContent       = fmt(hpp);
+    document.getElementById('statProfit').className      = 'stat-value ' + (profitPcs >= 0 ? 'positive' : 'warn');
+    document.getElementById('statProfit').textContent    = profitPcs >= 0 ? fmt(profitPcs) : '-' + fmt(Math.abs(profitPcs));
+    document.getElementById('statProfitSub').textContent = 'setelah diskon ' + diskon + '%';
+    document.getElementById('statMargin').textContent    = margin.toFixed(0) + '%';
+    document.getElementById('statMarkup').textContent    = markup.toFixed(0) + '%';
+    document.getElementById('revLabel').textContent      = 'Revenue ' + qty + ' pcs';
+    document.getElementById('statRevenue').textContent   = fmt(revenue);
+    document.getElementById('revSub').textContent        = 'kalau semua laku';
+    document.getElementById('profitTotalLabel').textContent = 'Profit ' + qty + ' pcs';
+    document.getElementById('statProfitTotal').className = 'stat-value ' + (profitTotal >= 0 ? 'positive' : 'warn');
+    document.getElementById('statProfitTotal').textContent = profitTotal >= 0 ? fmt(profitTotal) : '-' + fmt(Math.abs(profitTotal));
+    document.getElementById('profitTotalSub').textContent  = 'bersih dari ' + qty + ' pcs';
+
+    // BEP display
+    document.getElementById('bepModal').textContent = fmt(modal);
+    document.getElementById('bepUnit').textContent  = bepUnit === Infinity ? '∞' : bepUnit + ' pcs';
+    document.getElementById('bepOmset').textContent = bepOmset === Infinity ? '∞' : fmt(bepOmset);
+
+    // Tip
+    const tip = document.getElementById('marginTip');
+    if (profitPcs < 0) {
+      tip.textContent = '⚠️ Harga jual lebih rendah dari HPP! Kamu rugi ' + fmt(Math.abs(profitPcs)) + '/pcs. Naikkan harga jual.';
+    } else if (margin < 20) {
+      tip.textContent = '⚠️ Margin ' + margin.toFixed(0) + '% — terlalu tipis. Coba naikkan harga jual atau kurangi biaya.';
+    } else if (margin < 30) {
+      tip.textContent = '💡 Margin ' + margin.toFixed(0) + '% — hampir ideal. Coba naikkan harga jual sedikit untuk ≥30%.';
+    } else {
+      tip.textContent = '✅ Margin ' + margin.toFixed(0) + '% — bagus! Harga sudah sehat untuk brand baru.';
+    }
+  }
+
+  ['bahan','pkg','harga','diskon','qty','modal'].forEach(id => {
+    document.getElementById(id).addEventListener('input', calc);
+  });
+
+  calc();
+</script>
+</body>
+</html>
